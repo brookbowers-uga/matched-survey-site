@@ -1,0 +1,277 @@
+---
+output:
+  pdf_document:
+    extra_dependencies:
+      sectsty: null
+      fancyhdr: null
+      booktabs: null
+      longtable: null
+      array: null
+      multirow: null
+      wrapfig: null
+      float: null
+      colortbl: null
+      pdflscape: null
+      tabu: null
+      threeparttable: null
+      threeparttablex: null
+      ulem: ["normalem"]
+      makecell: null
+      xcolor: null
+  always_allow_html: yes
+  header-includes:
+    - \allsectionsfont{\color{red}}
+# params:
+#   ResponseId: "R_Q9RWK6eLom38vGp"
+#   FirstNameGS: "Test"
+#   LastNameGS: "Student"
+#   PrimaryDepartmentGS: 1
+#   FirstNameRA: "Test"
+#   LastNameRA: "Professor"
+#   EmailRA: "test@test.edu"
+#   EmailGS: "test@test.edu"
+#   WorkingWellGS: "lorem ipsum"
+#   NeedsImproveGS: "set dolor"
+#   WorkingWellRA: "latin"
+#   NeedsImproveRA: "latin"
+#   YearInProgram: 4
+#   RankRA: 1
+#   PrimaryDepartmentRA: 1
+#   careersupportmeanGS: 0
+#   psychsupportmeanGS: 0
+#   relqualmeanGS: 0
+#   careersupportmeanRA: 0
+#   psychsupportmeanRA: 0
+#   relqualmeanRA: 0
+#   sum_av_car_diff: 0
+#   sum_av_psych_diff: 0
+#   sum_av_rel_diff: 0
+#   car_median_GS: 0
+#   psych_median_GS: 0
+#   rel_median_GS: 0
+#   car_median_RA: 0
+#   psych_median_RA: 0
+#   rel_median_RA: 0
+#   Car_diff: 0
+#   av_car_diff: 0
+#   Psych_diff: 0
+#   av_psych_diff: 0
+#   Rel_diff: 0
+#   av_rel_diff: 0
+---
+
+```{r, include=FALSE}
+options(tinytex.verbose = TRUE)
+```
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(knitr)
+library(kableExtra)
+library(ggplot2)
+library(stringr)
+library(readr)
+library(psych)
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+```{r, echo=FALSE, out.width="100%", fig.align = "center"}
+# no access to this one- replace with url
+#knitr::include_graphics(c("/Users/rileyhess/Google Drive/PhD/Dolan Lab/Advisor Pilot Study/UGA Logo.jpeg"))
+#knitr::include_url("https://brand.uga.edu/wp-content/uploads/GEORGIA-FS-FC-768x252.png", height = 252)
+knitr::include_graphics(c("./header.png"))
+```
+
+# Summer 2021
+
+```{r, echo=FALSE}
+text_tbl_demo <- data.frame(
+  "1" = c ("Graduate Student First Name", "Graduate Student Last Name", "Department", "Year in Program", "Email"),
+  "2"  = c(params$FirstNameGS, params$LastNameGS, params$PrimaryDepartmentGS, params$YearInProgram, params$EmailGS),
+  "3" = c("Research Advisor First Name", 
+             "Research Advisor Last Name",
+             "Department",
+              "Rank",
+              "Email"),
+  "4" = c(params$FirstNameRA,  params$LastNameRA, params$PrimaryDepartmentRA, params$RankRA,params$EmailRA)
+)
+kbl(text_tbl_demo, booktabs = T, col.names = c(" ", "", " ", " ")) %>% 
+  kable_paper(full_width=F) %>%
+  column_spec(1, width="12em", bold = T, border_right=F)%>%
+  column_spec(2, width="12em", border_right=F) %>% 
+  column_spec(3, width="12em", bold = T, border_right=F)%>%
+  column_spec(4, width="12em", border_right = F) %>% 
+  kable_minimal(full_width = FALSE, position = "center") %>% 
+  kable_styling(latex_options = c("hold_position"))
+  
+```
+
+# Report Overview
+
+You recently completed a *Research Advisor-Graduate Student Feedback* survey. The purposes of this survey are to (1) give faculty research advisors and graduate student advisees a chance to reflect on their working relationship to identify strengths and areas for improvement and (2) use the results to provide actionable feedback to the advisor-advisee pair. 
+
+## Definition of Advising Relationship Characteristics
+
+```{r, echo=FALSE}
+text_tbl_1 <- data.frame(
+  " " = c ("Career Support", "Psychological Support", "Relationship Quality"),
+  " " = c("Things the advisor does to help the advisee reach their career goals. This was measured using 21 items on a 5-point scale. Higher scores indicate more perceived positive career support.", "Things that the advisor does to enhance the advisee's confidence as well as their personal and emotional development. This was measured using 20 items on a 5-point scale. Higher scores indicate more perceived positive psychosocial support.","The degree to which the working relationship between the advisor and advisee is trusting, rewarding, and satisfying. This was measured using 4 items on a 5-point scale. Higher scores indicate perceptions of a higher quality relationship.")
+)
+kbl(text_tbl_1, booktabs = T, col.names = c(" "," ")) %>%
+  kable_paper(full_width=F) %>%
+  column_spec(1, bold = F, border_right=F, border_left = F)%>%
+  column_spec(2, width="30em", background = "white") %>% 
+  row_spec((text_tbl_1 %>% 
+              nrow()), extra_latex_after = "\\arrayrulecolor{white}") %>% 
+  row_spec(row=0, extra_latex_after = "\\arrayrulecolor{white}") %>% 
+  kable_styling(full_width = FALSE, position = "left", latex_options = c("hold_position"))
+```
+\newpage
+In this report, you will find: 
+
+1. Summary statistics for career support, psychosocial support, and relationship quality from each of your perspectives. 
+
+2. "Difference scores" for career support, psychosocial support, and relationship quality. This score indicates how similar your ratings were to each other and allows you to more easily compare your ratings. ^[Difference scores are calculated by taking the absolute value of the between ratings on each of your paired items for all of the items in each scale, then dividing by the number of items in the scale. For instance, on a 4-item scale, if a graduate student rates an advisor a 5 on the first item and 4s on the last three items and the advisor self-rates a 4 on the first item and 5s on the last three items (|5-4|+|4-5|+|4-5|+|4-5|), the absolute difference = 4 and the difference score = 4/4 = 1.] 
+
+3. Open-ended feedback responses from each of you on what is working well in your relationship and how your relationship could be improved. 
+
+4. Recommendations based on research on mentorship and interpersonal communication that may be useful for enhancing your working relationship. 
+
+ 
+
+
+```{r, echo=FALSE, eval=FALSE}
+
+#Descriptive Statistics
+
+text_tbl_2 <- data.frame(
+  DescriptiveStatistics = c("Graduate Student Response Mean",
+                             "Graduate Student Response Median",
+                             "Research Advisor Response Mean",
+                             "Research Advisor Response Median",
+                             "Sum of the Absolute Value of Item-by-Item Differences"),
+  "Career Support" = c(params$careersupportmeanGS, params$car_median_GS, params$careersupportmeanRA, params$car_median_RA, params$sum_av_car_diff),
+  
+  "Psychological Support" = c(params$psychsupportmeanGS, params$psych_median_GS, params$psychsupportmeanRA, params$psych_median_RA, params$sum_av_psych_diff),
+  
+  "Relationship Quality" = c(params$relqualmeanGS, params$rel_median_GS, params$relqualmeanRA, params$rel_median_RA,
+params$sum_al_rel_diff))
+ 
+kbl(text_tbl_2, booktabs = T,col.names = c("Descriptive Statistics", "Career Support", "Psychological Support", "Relationship Quality")) %>%
+  kable_paper(full_width=F) %>%
+  column_spec(1, width = "10em", bold = F, border_right=T)%>%
+  column_spec(2, background = "white") %>% 
+  kable_styling(full_width = FALSE, position = "left", latex_options = c("hold_position"))
+
+```
+
+# Summary Statistics
+## Career Support
+
+```{r, echo = FALSE}
+#Descriptive Statistics 2 
+#Career Support 
+text_tbl_2.1 <- data.frame(
+  DescriptiveStatistics = c("Mean", "Standard Deviation", "Difference Score"),
+  
+  "Graduate Student" = c(round(params$careersupportmeanGS, 2), round(params$car_median_GS, 2), " "),
+  "Research Advisor" = c(params$careersupportmeanRA, params$car_median_RA, " "),
+  " " = c(" ", " ", params$sum_av_car_diff))
+
+kbl(text_tbl_2.1, booktabs = T, digits = 2, col.names = c(" ", "Graduate Student", "Research Advisor", "")) %>%
+  kable_paper(full_width=F) %>%
+  column_spec(1, width = "10em", bold = F, border_right=T)%>%
+  column_spec(2, background = "white") %>% 
+  kable_styling(full_width = FALSE, position = "left", latex_options =  c("hold_position")) 
+```
+
+## Psychological Support
+
+```{r, echo = FALSE}
+text_tbl_2.2 <- data.frame(
+  DescriptiveStatistics = c("Mean", "Standard Deviation", "Difference Score"),
+  
+  "Graduate Student" = c(params$psychsupportmeanGS, params$psych_median_GS, " "),
+  "Research Advisor" = c(params$psychsupportmeanRA, params$psych_median_RA, " "),
+  " " = c(" ", " ", params$sum_av_psych_diff))
+
+kbl(text_tbl_2.2, booktabs = T, digits = 2, col.names = c(" ", "Graduate Student", "Research Advisor", "")) %>%
+  kable_paper(full_width=F) %>%
+  column_spec(1, width = "10em", bold = F, border_right=T)%>%
+  column_spec(2, background = "white") %>% 
+  kable_styling(full_width = FALSE, position = "left", latex_options = c("hold_position"))
+```
+
+## Relationship Quality
+
+```{r, echo = FALSE}
+text_tbl_2.3 <- data.frame(
+  DescriptiveStatistics = c("Mean", "Standard Deviation", "Difference Score"),
+  
+  "Graduate Student" = c(params$relqualmeanGS, params$rel_median_GS, " "),
+  "Research Advisor" = c(params$relqualmeanRA, params$rel_median_RA, " "),
+  " " = c(" ", " ", params$sum_av_rel_diff))
+
+kbl(text_tbl_2.3, booktabs = T, digits = 2, col.names = c(" ", "Graduate Student", "Research Advisor", "")) %>%
+  kable_paper(full_width=F) %>%
+  column_spec(1, width = "10em", bold = F, border_right=T)%>%
+  column_spec(2, background = "white") %>% 
+  kable_styling(full_width = FALSE, position = "left", latex_options = c("hold_position"))
+```
+
+
+
+```{r, eval = FALSE, echo=FALSE}
+ggplot(data, aes(x = target, y=accessibility, fill = target)) + #fill means what are the two groups you want
+    geom_boxplot() +
+    labs(title="Accessibility", x = "", y = "") +
+    coord_cartesian(ylim = c(1, 5)) + #y axis should be 1-5
+    theme_classic() + 
+    theme(legend.position="none")
+```
+
+\newpage
+
+# Open-ended Feedback
+## Aspects of your relationship that you find helpful for working together
+
+*Graduate Student Response*
+```{r, echo = FALSE, comment=NA}
+cat(noquote(params$WorkingWellGS))
+```
+
+*Research Advisor Response*
+```{r, echo = FALSE, comment=NA}
+cat(noquote(params$WorkingWellRA))
+```
+
+## Ideas you have for improving how well you work together
+
+*Graduate Student Response*
+```{r, echo = FALSE, comment=NA}
+cat(noquote(params$NeedsImproveGS))
+```
+
+*Research Advisor Response*
+```{r, echo = FALSE, comment = NA}
+cat(noquote(params$NeedsImproveRA))
+```
+
+
+```{r, echo=FALSE, eval=FALSE, comment = NA}
+text_tbl_3 <- data.frame(
+  
+)
+```
+
+```{r, echo=FALSE, eval=FALSE}
+params
+
+```
+
+# Recommendations
+```{r,echo=FALSE,comment=NA}
+cat(noquote(params$feedback))
+```
+

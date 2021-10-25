@@ -36,6 +36,9 @@ query <- function(query) {
 }
 
 query("CREATE TABLE IF NOT EXISTS sums(sum INTEGER);")
-query("CREATE TABLE IF NOT EXISTS responses(surveyID, responseID);")
+query("CREATE TABLE IF NOT EXISTS advisor_responses(surveyID, responseID, pairID);")
+query("CREATE TABLE IF NOT EXISTS advisee_responses(surveyID, responseID, pairID);")
+query("CREATE TABLE IF NOT EXISTS report_feedback(pairID, feedback);")
+query("CREATE TABLE IF NOT EXISTS emails_sent(pairID, dateTime);")
 
-loadData("sums")
+#loadData("sums")

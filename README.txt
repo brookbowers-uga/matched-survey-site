@@ -15,7 +15,15 @@ install.packages(httr)
 # parsing json from web requests
 install.packages(jsonlite)
 # web app for visualization
-shiny
+install.packages(shiny)
+
+# for reporting
+install.packages(knitr)
+install.packages(kableExtra)
+install.packages(ggplot2)
+install.packages(stringr)
+install.packages(readr)
+install.packages(psych)
 
 ==Setup==
 You need to provide an API secret from the google developer console for GMail API. MSS will then have you do an authorization step in browser, then MSS can send emails on your behalf.

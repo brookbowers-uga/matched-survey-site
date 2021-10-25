@@ -29,9 +29,21 @@ function(a, b) {
 #* Store survey and response id
 #* @param surveyID
 #* @param responseID
-#* @post /recordResponse
-function(surveyID, responseID) {
+#* @param pairID
+#* @post /recordAdviseeResponse
+function(surveyID, responseID, pairID) {
   res <- data.frame(surveyID = surveyID, responseID = responseID)
-  saveData(res, "responses")
+  saveData(res, "advisee_responses")
+  res
+}
+
+#* Store survey and response id
+#* @param surveyID
+#* @param responseID
+#* @param pairID
+#* @post /recordAdvisorResponse
+function(surveyID, responseID, pairID) {
+  res <- data.frame(surveyID = surveyID, responseID = responseID)
+  saveData(res, "advisor_responses")
   res
 }

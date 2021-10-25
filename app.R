@@ -11,7 +11,8 @@ library(shiny)
 
 source("db.R")
 source("email.R")
-
+source("qualtrics.R")
+source("matched-pairs.R")
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -22,37 +23,30 @@ ui <- fluidPage(
     # Sidebar with a slider input for number of bins 
     sidebarLayout(
         sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 5,
-                        max = 50,
-                        value = 30),
-            actionButton("email", "Email")
+            actionButton("email", "Send Email")
         ),
 
         # Show a plot of the generated distribution
         mainPanel(
-           tabsetPanel(
-             tabPanel("hist", plotOutput("distPlot"), textInput("emailText", h3("Additional email text"), value="Optional text to go in the email")),
-             tabPanel("text", h1("JESUS"))
-           )
+          textInput("feedback", h3("Feedback"), placeholder="Optional text to go in the report")
+           #tabsetPanel(
+             #tabPanel("Report", tags$iframe(style="height:600px; width:100%", src="http://localhost/ressources/pdf/R-Intro.pdf"))
+             #tabPanel("hist", plotOutput("distPlot"), textInput("feedback", h3("Feedback"), placeholder="Optional text to go in the report")),
+             #tabPanel("text", h1("JESUS"))
+           #)
         )
     )
 )
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
-    output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- unlist(loadData("sums"), use.names = FALSE)
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'orange')
-    })
-    
     observeEvent(input$email, {
-      send(output$distplot, input$emailText)
+      params <- calcPair(
+        mapAdvisorQualtricsResults(fetchResponse("SV_dcXVPtf3N55z3ng","R_3Ic7LXPYQFHbLd4")),
+        mapAdviseeQualtricsResults(fetchResponse("SV_9BjFOsJZkUxX7dc","R_1DqGryQbOjdZpxb")))
+      params$feedback <- input$feedback
+      rmarkdown::render("New.Rmd", output_file="report.pdf", params = params)
+      #send(output$distplot, input$emailText)
     })
 }
 
