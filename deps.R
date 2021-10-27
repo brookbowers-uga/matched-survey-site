@@ -22,8 +22,8 @@ if(!require(stringr)) install.packages("stringr", repos = repo)
 if(!require(readr)) install.packages("readr", repos = repo)
 if(!require(psych)) install.packages("psych", repos = repo)
 if(!require(rmarkdown)) install.packages("rmarkdown", repos = repo)
+if(!require(tidyverse)) install.packages("tidyverse", repos = repo)
 if(!require(lubridate)) install.packages("lubridate", repos = repo)
-
 
 #tinytex::install_tinytex()
 #webshot::install_phantomjs()

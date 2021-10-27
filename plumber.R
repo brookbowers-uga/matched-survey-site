@@ -1,6 +1,9 @@
 # plumber.R
 source("db.R")
-
+source("qualtrics.R")
+source("matched-pairs.R")
+source("email.R")
+library(tidyverse)
 #* Echo back the input
 #* @param msg The message to echo
 #* @get /echo
@@ -32,7 +35,7 @@ function(a, b) {
 #* @param pairID
 #* @post /recordAdviseeResponse
 function(surveyID, responseID, pairID) {
-  res <- data.frame(surveyID = surveyID, responseID = responseID)
+  res <- data.frame(surveyID = surveyID, responseID = responseID, pairID = pairID)
   saveData(res, "advisee_responses")
   res
 }
@@ -43,7 +46,19 @@ function(surveyID, responseID, pairID) {
 #* @param pairID
 #* @post /recordAdvisorResponse
 function(surveyID, responseID, pairID) {
-  res <- data.frame(surveyID = surveyID, responseID = responseID)
+  res <- data.frame(surveyID = surveyID, responseID = responseID, pairID = pairID)
   saveData(res, "advisor_responses")
-  res
+  advisee <- loadQuery(paste("SELECT * FROM advisee_responses WHERE pairID =", pairID))
+  qualtricsAdvisee <- mapAdviseeQualtricsResults(fetchResponse(surveyID = advisee$surveyID, responseID = advisee$responseID))
+  qualtricsAdvisor <- mapAdvisorQualtricsResults(fetchResponse(surveyID = surveyID, responseID = responseID))
+  matchedPair <- calcPair(qualtricsAdvisor, qualtricsAdvisee)
+  matchedPair$feedback <- "Please reach out to hfedesco@uga.edu for any questions, comments, or concerns!"
+  reportName <- paste("report-",qualtricsAdvisee$FirstName,"-",qualtricsAdvisor$Firstname,"-",Sys.Date,".pdf",sep="")
+  rmarkdown::render("New.Rmd", output_file=reportName, params = matchedPair)
+  send("matched.pairs.uga@gmail.com", c(qualtricsAdvisee$Email, qualtricsAdvisor$Email), "Please find attached your advisee/advisor report", reportName)
+  file.remove(reportName)
+  sentEmail <- data.frame(pairID, now())
+  saveData("emails_sent", sentEmail)
+
+  sentEmail
 }

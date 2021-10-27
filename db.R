@@ -28,6 +28,14 @@ loadData <- function(table) {
   data
 }
 
+loadQuery <- function(query) {
+  db <- dbConnect(SQLite(), dbPath)
+  data <- dbGetQuery(db, query)
+  dbDisconnect(db)
+  data
+}
+
+
 query <- function(query) {
   db <- dbConnect(SQLite(), dbPath)
   data <- dbExecute(db, query)
