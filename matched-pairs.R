@@ -142,8 +142,8 @@ mapAdvisorQualtricsResults <- function(dat) {
                  values$QID69_6)
   res$WorkingWell <- values$QID70_TEXT
   res$NeedsImprove <- values$QID71_TEXT
-  res$FirstName <- values$QID77_TEXT
-  res$LastName <- values$QID87_TEXT
+  res$FirstName <- values$QID81_TEXT
+  res$LastName <- values$QID82_TEXT
   res$Email <- values$QID83_TEXT
   res$PrimaryDepartment <- labels$QID90
   res$Rank <- labels$QID92
